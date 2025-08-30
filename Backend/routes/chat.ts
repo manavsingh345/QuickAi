@@ -65,6 +65,7 @@ router.delete("/thread/:threadId",async(req,res)=>{
     }
 });
 
+
 router.post("/chat",async(req,res)=>{
     const {threadId,message} = req.body;
     if(!threadId || !message){
