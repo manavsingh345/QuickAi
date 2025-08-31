@@ -1,0 +1,47 @@
+.Sidebar{
+  background-color: #171717;
+  color:#b4b4b4;
+  width: 320px;
+}
+button{
+    margin: 10px;
+    padding:10px;
+    border-radius: 10px;
+    background-color: transparent;
+    border-color: rgb(255,255,255,0.5);
+}
+.logo{
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border-radius: 50%;
+    object-fit: cover;
+}
+button span{
+    font-size:20px;
+}
+
+button:hover{
+    background-color: rgb(180,180,180,0.05);
+    cursor: pointer;
+}
+
+.history{
+    margin:10px;
+    padding:10px;
+    height: 100%;
+}
+
+.history li{
+    list-style-type: none;
+    cursor: pointer;
+    padding:2px 5px;
+    margin-bottom: 0.3rem;
+    font-size:14px;
+    border: solid 10px transparent;
+    position:relative;
+}
+.history li:hover{
+    background-color: rgb(180,180,180,0.05);
+    border-radius: 10px;
+}
