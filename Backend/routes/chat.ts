@@ -69,16 +69,16 @@ router.delete("/thread/:threadId",async(req,res)=>{
 router.post("/chat",async(req,res)=>{
     const {threadId,message} = req.body;
     if(!threadId || !message){
-        res.status(400).json({error:"missing rrquired fields"});
+        return res.status(400).json({error:"missing rrquired fields"});
     }
     try{
-        let th=await thread.findOne(({threadId}));
+        let th = await thread.findOne({ threadId });
         if(!th){
             //create new one 
             th=new thread({
                 threadId,
                 title:message,
-                messages:[{role:"user",contet:message}]             //store in db
+                messages:[{role:"user", content:message}]             //store in db
             });
         }else{
             th.messages.push({role:"user",content:message});        //store in db
