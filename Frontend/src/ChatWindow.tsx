@@ -1,6 +1,32 @@
+import { useContext } from "react"
 import Chat from "./Chat"
 import "./ChatWindow.css"
+import { MyContext } from "./Context"
+
 export default function ChatWindow(){
+    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId}=useContext(MyContext);
+    const getReply= async ()=>{
+        const payload={
+            message:prompt,
+            threadId:currThreadId
+
+        }
+        const options = {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify(payload),
+        };
+        try{
+            const response=await fetch("http://localhost:8000/api/chat",options);
+            const data=await response.json();
+            console.log(data);
+            setReply(data.reply);
+        }catch(err){
+            console.log(err);
+        }
+    }   
     return(
         <div className="chatWindow h-screen w-full flex flex-col justify-between items-center text-center">
         <div className="w-full flex justify-between items-center">
@@ -13,8 +39,11 @@ export default function ChatWindow(){
 
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
-                <input type="text" placeholder="Ask anything" className="w-full"/>
-                <div id="submit" className="cursor-pointer absolute flex justify-center items-center text-xl">
+                <input type="text" placeholder="Ask anything" className="w-full"
+                value={prompt} onChange={(e)=>setPrompt(e.target.value)}
+                onKeyDown={(e)=> e.key === 'Enter'? getReply() : '' }/>
+
+                <div id="submit" onClick={getReply} className="cursor-pointer absolute flex justify-center items-center text-xl">
                     <i className="fa-solid fa-paper-plane"></i>
                 </div>
             </div>
