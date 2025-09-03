@@ -1,5 +1,8 @@
 import { createContext, type Dispatch, type SetStateAction } from "react";
-
+type Chat = {
+  role: string;
+  content: string;
+};
 type MyContextType = {
   prompt: string;
   setPrompt: Dispatch<SetStateAction<string>>;
@@ -7,9 +10,13 @@ type MyContextType = {
   setReply: Dispatch<SetStateAction<string>>;
   currThreadId:string;
   setcurrThreadId:Dispatch<SetStateAction<string>>;
+  newChat:boolean;
+  setnewChat:Dispatch<SetStateAction<boolean>>;
+  prevChats: Chat[];
+  setprevChats: Dispatch<SetStateAction<Chat[]>>;
 };
 
-// ✅ pass the correct type
+
 export const MyContext = createContext<MyContextType>({
   prompt: "",
   setPrompt: () => {}, // dummy function
@@ -17,5 +24,9 @@ export const MyContext = createContext<MyContextType>({
   setReply: () => {},  // dummy function
   currThreadId:"",
   setcurrThreadId:() => {},
+  newChat:true,
+  setnewChat:()=>{},
+  prevChats:[],
+  setprevChats:()=>{}
   
 });

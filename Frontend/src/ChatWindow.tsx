@@ -1,11 +1,16 @@
-import { useContext } from "react"
+import { useContext,useState,useEffect } from "react"
 import Chat from "./Chat"
 import "./ChatWindow.css"
 import { MyContext } from "./Context"
+import { RingLoader } from "react-spinners"
 
 export default function ChatWindow(){
-    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId}=useContext(MyContext);
+    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId,prevChats,setprevChats}=useContext(MyContext);
+    const [loader,setloader]=useState<boolean>(false);
+   
+
     const getReply= async ()=>{
+        setloader(true);
         const payload={
             message:prompt,
             threadId:currThreadId
@@ -26,7 +31,24 @@ export default function ChatWindow(){
         }catch(err){
             console.log(err);
         }
+        setloader(false);
     }   
+    //Append newChats to prevChats
+    useEffect(()=>{
+        if(prompt && reply){
+            setprevChats(prevChats => (
+                [...prevChats,{
+                    role:"user",
+                    content:prompt
+                },{
+                    role:"assistant",
+                    content:reply
+                }]
+            ))
+        }
+        setPrompt("");
+    },[reply]);
+
     return(
         <div className="chatWindow h-screen w-full flex flex-col justify-between items-center text-center">
         <div className="w-full flex justify-between items-center">
@@ -36,7 +58,7 @@ export default function ChatWindow(){
             </div>
         </div>
         <Chat></Chat>
-
+        <RingLoader color="#fff" loading={loader}/>
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
                 <input type="text" placeholder="Ask anything" className="w-full"
