@@ -33,6 +33,7 @@ export default function ChatWindow(){
         }
         setloader(false);
     }   
+
     //Append newChats to prevChats
     useEffect(()=>{
         if(prompt && reply){
