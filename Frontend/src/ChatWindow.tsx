@@ -62,7 +62,7 @@ export default function ChatWindow(){
         <RingLoader color="#fff" loading={loader}/>
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
-                <input type="text" placeholder="Ask anything" className="w-full"
+                <textarea  placeholder="Ask anything" className="w-full"
                 value={prompt} onChange={(e)=>setPrompt(e.target.value)}
                 onKeyDown={(e)=> e.key === 'Enter'? getReply() : '' }/>
 
