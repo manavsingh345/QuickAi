@@ -66,7 +66,7 @@ export default function Sidebar(){
             <ul className="history">
                 {
                     allThreads?.map((thread:Thread,idx:number) =>(
-                        <li key={idx} onClick={(e) => changeThread(thread.threadId)}>{thread.title} <i className="fa-solid fa-trash"
+                        <li key={idx} onClick={() => changeThread(thread.threadId)}>{thread.title} <i className="fa-solid fa-trash"
                         onClick={(e)=>{
                             e.stopPropagation(); //stop event bubbling
                             deleteThread(thread.threadId);
