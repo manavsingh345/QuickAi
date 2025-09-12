@@ -5,12 +5,13 @@ import { MyContext } from "./Context"
 import { RingLoader } from "react-spinners"
 
 export default function ChatWindow(){
-    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId,prevChats,setprevChats}=useContext(MyContext);
+    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId,prevChats,setprevChats,setnewChat}=useContext(MyContext);
     const [loader,setloader]=useState<boolean>(false);
    
 
     const getReply= async ()=>{
         setloader(true);
+        setnewChat(false);
         const payload={
             message:prompt,
             threadId:currThreadId

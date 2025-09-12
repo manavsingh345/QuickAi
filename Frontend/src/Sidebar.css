@@ -46,3 +46,15 @@ button:hover{
     background-color: rgb(180,180,180,0.05);
     border-radius: 10px;
 }
+.fa-trash{
+    opacity: 0;
+    position: absolute;
+    right: 0;
+}
+.history li:hover .fa-trash{
+    opacity: 1;
+    color:#fff;
+}
+.fa-trash:hover{
+    color:rgb(221, 59, 59) !important;
+}

@@ -7,6 +7,10 @@ export default function Chat(){
     const [latestReply,setLatestReply]=useState("");
 
     useEffect(()=>{
+        if(reply===""){
+            setLatestReply("");     //prevChats ko load kar rhe hai
+            return;
+        }
         if(!prevChats.length) return;
 
         const content=reply.split(" ");
@@ -39,6 +43,12 @@ export default function Chat(){
                 prevChats.length>0 && latestReply!=="" && 
                 <div className="gptDiv" key={"typing"}>
                     <ResponseRenderer content={latestReply}/>
+                </div>
+            }
+            {
+                prevChats.length>0 && latestReply ==="" &&          //store the last reply answer also to display
+                <div className="gptDiv" key={"non-typing"}>
+                    <ResponseRenderer content={prevChats[prevChats.length-1].content}/>    
                 </div>
             }
             
