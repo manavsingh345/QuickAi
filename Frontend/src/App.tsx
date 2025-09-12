@@ -10,6 +10,10 @@ type Chat = {
   role: string;
   content: string;
 };
+interface Thread {
+  threadId: string;
+  title: string;
+}
 
 function App() {
   const [prompt,setPrompt] = useState("");
@@ -17,13 +21,15 @@ function App() {
   const [currThreadId,setcurrThreadId] = useState<string>(uuidv1());
   const [prevChats,setprevChats]=useState<Chat[]>([]); //store all the chats of current thread
   const [newChat,setnewChat]=useState(true);
+  const [allThreads,setAllThreads]=useState<Thread[]>([]); //store all the threads
 
   const providerValues={
     prompt,setPrompt,
     reply,setReply,
     currThreadId,setcurrThreadId,
     newChat,setnewChat,
-    prevChats,setprevChats
+    prevChats,setprevChats,
+    allThreads,setAllThreads,
   };
 
 

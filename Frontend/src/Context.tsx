@@ -3,6 +3,10 @@ type Chat = {
   role: string;
   content: string;
 };
+interface Thread {
+  threadId: string;
+  title: string;
+}
 type MyContextType = {
   prompt: string;
   setPrompt: Dispatch<SetStateAction<string>>;
@@ -14,6 +18,8 @@ type MyContextType = {
   setnewChat:Dispatch<SetStateAction<boolean>>;
   prevChats: Chat[];
   setprevChats: Dispatch<SetStateAction<Chat[]>>;
+  allThreads:Thread[];
+  setAllThreads:Dispatch<SetStateAction<Thread[]>>;
 };
 
 
@@ -27,6 +33,7 @@ export const MyContext = createContext<MyContextType>({
   newChat:true,
   setnewChat:()=>{},
   prevChats:[],
-  setprevChats:()=>{}
-  
+  setprevChats:()=>{},
+  allThreads:[],
+  setAllThreads:()=>{},
 });
