@@ -2,7 +2,9 @@ import express from "express";
 import thread from "../models/thread.js";
 const router = express.Router();
 import generateOpenAiResponse from "../utils/openai.js";
-
+import cors from 'cors'
+const app=express();
+app.use(cors())
 router.post("/test", async (req,res)=>{
     try{
         const th =new thread({
