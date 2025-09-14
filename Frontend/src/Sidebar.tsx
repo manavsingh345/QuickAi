@@ -75,8 +75,9 @@ export default function Sidebar(){
                 }
             </ul>
 
-            <div className="sign">
-                <p>Apna College</p>
+            <div className="sign bottom-0 fixed flex pt-4 pl-2">
+                <span className="userIcon h-6 w-6 rounded-full flex justify-center items-center cursor-pointer"><i className="fa-solid fa-user"></i></span>
+                <p className="pl-2">Apna College</p>
             </div>
         </section>
     )
