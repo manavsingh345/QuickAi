@@ -59,7 +59,7 @@ export default function Sidebar(){
         }
     }
     const Card= async ()=>{
-        SetCardOpen(true);
+        SetCardOpen((prev)=>!prev);
     }
     return(
         <section className="Sidebar flex flex-col justify-between h-screen" >
@@ -85,14 +85,16 @@ export default function Sidebar(){
                 <p className="pl-2">Manav Singh</p>
             </div>
 
-           {CardOpen && <div className="h-90 w-60 bg-gray-700 m-4 rounded-lg pr-4 mr-4 mb-15 bottom-0 left-0" >
-           <span className="flex justify-center p-2 text-sm "><i className="fa-solid fa-user mr-2 pt-1"></i>manavsingh321@gmail.com</span>
+           {CardOpen && <div className="h-100 w-60 bg-gray-700 m-4 rounded-lg pr-4 mr-4 mb-15 bottom-0 left-0" >
+           <div className="flex"><span className="flex justify-center p-2 text-sm "><i className="fa-solid fa-user mr-2 pt-1"></i>manavsingh321@gmail.com</span>
+            </div>
+
            <div className="m-2 p-2">
-                <p>Apperance</p>
-                <p>Settings</p>
-                
+                <p className="pb-4"><i className="fa-solid fa-moon pr-6"></i>Apperance</p>
+                <p><i className="fa-solid fa-gear pr-6"></i>Settings</p>   
            </div>
-           <button>Logout</button>
+           <hr />
+           <button><i className="fa-solid fa-right-from-bracket pr-6"></i>Log out</button>
         </div>}
         </section>
         
