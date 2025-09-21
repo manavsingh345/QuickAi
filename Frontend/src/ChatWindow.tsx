@@ -53,7 +53,7 @@ export default function ChatWindow(){
     },[reply]);
 
     return(
-        <div className="chatWindow h-screen w-full flex flex-col justify-between items-center text-center">
+        <div className="chatWindow h-screen w-full flex flex-col justify-between items-center text-center bg-white text-black dark:bg-black dark:text-white">
         <div className="w-full flex justify-between items-center">
             <span className="m-4">QuickAi</span>
             <ModeToggle></ModeToggle>
