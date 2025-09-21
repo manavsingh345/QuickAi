@@ -3,6 +3,7 @@ import Chat from "./Chat"
 import "./ChatWindow.css"
 import { MyContext } from "./Context"
 import { RingLoader } from "react-spinners"
+import { ModeToggle } from "./components/mode-toggle"
 
 export default function ChatWindow(){
     const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId,prevChats,setprevChats,setnewChat}=useContext(MyContext);
@@ -55,6 +56,7 @@ export default function ChatWindow(){
         <div className="chatWindow h-screen w-full flex flex-col justify-between items-center text-center">
         <div className="w-full flex justify-between items-center">
             <span className="m-4">QuickAi</span>
+            <ModeToggle></ModeToggle>
             <div className="m-4 pr-4">
                <span className="userIcon h-8 w-8 rounded-full flex justify-center items-center cursor-pointer"><i className="fa-solid fa-user"></i></span>
             </div>
