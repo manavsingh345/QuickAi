@@ -5,6 +5,7 @@ import { MyContext } from './Context';
 import { useState } from 'react';
 import "./index.css"
 import {v1 as uuidv1} from "uuid";
+import { ThemeProvider } from './components/theme-provider';
 
 type Chat = {
   role: string;
@@ -34,13 +35,14 @@ function App() {
 
 
   return (
-    
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
     <div className='app'>
       <MyContext.Provider value = {providerValues}>
           <Sidebar></Sidebar>
           <ChatWindow></ChatWindow>
       </MyContext.Provider>
     </div>
+    </ThemeProvider>
    
   )
 }
