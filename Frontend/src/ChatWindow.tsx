@@ -6,7 +6,7 @@ import { RingLoader } from "react-spinners"
 import { ModeToggle } from "./components/mode-toggle"
 
 export default function ChatWindow(){
-    const {prompt,setPrompt,reply,setReply,currThreadId,setcurrThreadId,prevChats,setprevChats,setnewChat}=useContext(MyContext);
+    const {prompt,setPrompt,reply,setReply,currThreadId,setprevChats,setnewChat}=useContext(MyContext);
     const [loader,setloader]=useState<boolean>(false);
    
 

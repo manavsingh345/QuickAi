@@ -35,7 +35,7 @@ function App() {
 
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme" >
     <div className='app'>
       <MyContext.Provider value = {providerValues}>
           <Sidebar></Sidebar>
