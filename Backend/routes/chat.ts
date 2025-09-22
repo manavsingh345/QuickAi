@@ -2,7 +2,9 @@ import express from "express";
 import thread from "../models/thread.js";
 const router = express.Router();
 import generateOpenAiResponse from "../utils/openai.js";
+
 import cors from 'cors'
+import { generateTitleFromMessage } from "../utils/summary.js";
 const app=express();
 app.use(cors())
 router.post("/test", async (req,res)=>{
@@ -68,33 +70,39 @@ router.delete("/thread/:threadId",async(req,res)=>{
 });
 
 
-router.post("/chat",async(req,res)=>{
-    const {threadId,message} = req.body;
-    if(!threadId || !message){
-        return res.status(400).json({error:"missing rrquired fields"});
-    }
-    try{
-        let th = await thread.findOne({ threadId });
-        if(!th){
-            //create new one 
-            th=new thread({
-                threadId,
-                title:message,
-                messages:[{role:"user", content:message}]             //store in db
-            });
-        }else{
-            th.messages.push({role:"user",content:message});        //store in db
-        }
+router.post("/chat", async (req, res) => {
+  const { threadId, message } = req.body;
 
-        const assiantReply= await generateOpenAiResponse(message);          
-        th.messages.push({role:"assistant",content:assiantReply});     //store in db
-        th.updatedAt=new Date();
-        await th.save();
+  if (!threadId || !message) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
 
-        res.json({reply:assiantReply});
-    }catch(e){
-        console.log(e);
-        res.status(500).json({e:"Error will sending msg"});
+  try {
+    let th = await thread.findOne({ threadId });
+
+    if (!th) {
+      const shortTitle = await generateTitleFromMessage(message);
+
+      th = new thread({
+        threadId,
+        title: shortTitle, 
+        messages: [{ role: "user", content: message }],
+      });
+    } else {
+      th.messages.push({ role: "user", content: message });
     }
-})
+
+    const assistantReply = await generateOpenAiResponse(message);
+    th.messages.push({ role: "assistant", content: assistantReply });
+    th.updatedAt = new Date();
+    await th.save();
+
+    res.json({ reply: assistantReply });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ e: "Error while sending message" });
+  }
+});
+
+
 export default router;
