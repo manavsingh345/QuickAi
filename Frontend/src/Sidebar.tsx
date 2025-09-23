@@ -11,6 +11,7 @@ export default function Sidebar(){
 
     const {allThreads,setAllThreads,currThreadId,setPrompt,setnewChat,setReply,setcurrThreadId,setprevChats} = useContext(MyContext);
     const [CardOpen,SetCardOpen]=useState(false);
+    const [sidebarOpen,setsidebarOpen]=useState(false);
 
     const getAllThreads = async () => {
         try{
@@ -61,8 +62,13 @@ export default function Sidebar(){
     const Card= async ()=>{
         SetCardOpen((prev)=>!prev);
     }
+    const Side=async()=>{
+        setsidebarOpen((prev)=>!prev);
+    }
     return(
-        <section className="Sidebar flex flex-col justify-between h-screen" >
+        <div className={`side  ${sidebarOpen ? "open" : "closed"}`}>
+            <button onClick={Side}>Side</button>
+        {sidebarOpen && <section className="Sidebar flex flex-col justify-between h-screen" >
             <button className="flex justify-between items-center cursor-pointer" onClick={NewChat}>
                 <img src="src\assets\blacklogo.png" alt="chatgptLogo" className="logo"/>
                 <span><i className="fa-solid fa-pen-to-square"></i></span>
@@ -80,7 +86,7 @@ export default function Sidebar(){
                 }
             </ul>
 
-            <div className="sign bottom-0 fixed flex pt-4 pl-2 cursor-pointer" onClick={Card}>
+            <div className="sign flex pt-4 pl-2 bottom-0 fixed cursor-pointer mt-auto" onClick={Card}>
                 <span className="userIcon h-6 w-6 rounded-full flex justify-center items-center cursor-pointer"><i className="fa-solid fa-user"></i></span>
                 <p className="pl-2">Manav Singh</p>
             </div>
@@ -96,8 +102,8 @@ export default function Sidebar(){
            <hr />
            <button><i className="fa-solid fa-right-from-bracket pr-6"></i>Log out</button>
         </div>}
-        </section>
-        
+        </section>}
+        </div>
         
     )
 };

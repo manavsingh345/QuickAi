@@ -25,7 +25,7 @@ export default function Chat(){
     },[prevChats,reply]);
     return (
         <>
-        {newChat && <h1 className="text-3xl">Qucik Ai Welcome's you!</h1>}
+        {newChat && <h1 className="text-3xl">Quick Ai Welcome's you!</h1>}
         <div className="chats w-full">
             {
                 prevChats?.slice(0,-1).map((chat,idx)=>
