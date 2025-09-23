@@ -67,13 +67,13 @@ export default function Sidebar(){
     }
     return(
         <div className={`side  ${sidebarOpen ? "open" : "closed"}`}>
-            <button onClick={Side}>Side</button>
+            <button onClick={Side}><img src="src\assets\expand.png"  className="h-6 w-7" alt="Menu" /></button>
         {sidebarOpen && <section className="Sidebar flex flex-col justify-between h-screen" >
             <button className="flex justify-between items-center cursor-pointer" onClick={NewChat}>
                 <img src="src\assets\blacklogo.png" alt="chatgptLogo" className="logo"/>
                 <span><i className="fa-solid fa-pen-to-square"></i></span>
             </button>
-
+            
             <ul className="history">
                 {
                     allThreads?.map((thread:Thread,idx:number) =>(
