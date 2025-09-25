@@ -1,27 +1,16 @@
 import express from "express";
 import thread from "../models/thread.js";
 const router = express.Router();
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' })
+
 import generateOpenAiResponse from "../utils/openai.js";
 
 import cors from 'cors'
 import { generateTitleFromMessage } from "../utils/summary.js";
 const app=express();
 app.use(cors())
-router.post("/test", async (req,res)=>{
-    try{
-        const th =new thread({
-            threadId:"123456",
-            title:"new one"
-        });
-        const response=await th.save();
-        res.send(response);
-    }catch(e){
-        console.log(e);
-        res.json({
-            message:"error comes"
-        })
-    }
-});
+
 
 //Get all threads
 router.get("/thread",async (req,res)=>{
@@ -104,5 +93,13 @@ router.post("/chat", async (req, res) => {
   }
 });
 
+
+
+//pdf
+router.post("/upload/pdf",upload.single('pdf'), (req, res)=>{
+    return res.json({
+        message:"uploaded"
+    })
+})
 
 export default router;
