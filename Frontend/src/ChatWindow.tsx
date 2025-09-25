@@ -35,7 +35,17 @@ export default function ChatWindow(){
         }
         setloader(false);
     }   
-
+    const handleFile= ()=>{
+        const el=document.createElement("input");
+        el.setAttribute("type","file");
+        el.setAttribute("accept","application/pdf");
+        el.addEventListener('change',()=>{
+            if(el.files){
+                console.log(el.files);
+            }
+        })
+        el.click();
+    }
     //Append newChats to prevChats
     useEffect(()=>{
         if(prompt && reply){
@@ -63,14 +73,19 @@ export default function ChatWindow(){
         </div>
         <Chat></Chat>
         <RingLoader color="#fff" loading={loader}/>
+
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
-                <textarea  placeholder="Ask anything" className="w-full"
+                {/* <div className="h-10 w-10"><input type="file" id="file" accept="application/pdf" placeholder="Choose file"/></div> */}
+               <div className="file cursor-pointer"onClick={handleFile}><i className="fa-solid fa-file-pdf"></i></div>
+                <textarea  placeholder="Ask anything" className="w-full" 
                 value={prompt} onChange={(e)=>setPrompt(e.target.value)}
                 onKeyDown={(e)=> e.key === 'Enter'? getReply() : '' }/>
 
                 <div id="submit" onClick={getReply} className="cursor-pointer absolute flex justify-center items-center text-xl">
+                    
                     <i className="fa-solid fa-paper-plane"></i>
+                     
                 </div>
             </div>
             <p className="info text-1xl">
