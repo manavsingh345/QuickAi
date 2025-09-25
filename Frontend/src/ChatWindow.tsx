@@ -5,6 +5,7 @@ import { MyContext } from "./Context"
 import { RingLoader } from "react-spinners"
 import { ModeToggle } from "./components/mode-toggle"
 
+
 export default function ChatWindow(){
     const {prompt,setPrompt,reply,setReply,currThreadId,setprevChats,setnewChat}=useContext(MyContext);
     const [loader,setloader]=useState<boolean>(false);
@@ -35,13 +36,25 @@ export default function ChatWindow(){
         }
         setloader(false);
     }   
-    const handleFile= ()=>{
+    const handleFile=  ()=>{
         const el=document.createElement("input");
         el.setAttribute("type","file");
         el.setAttribute("accept","application/pdf");
-        el.addEventListener('change',()=>{
-            if(el.files){
-                console.log(el.files);
+        el.addEventListener('change', async ()=>{
+            if(el.files && el.files.length>0){
+                const file=el.files.item(0);
+                if(file){
+                    const formData = new FormData();
+                    formData.append('pdf',file);
+                    const response=await fetch("http://localhost:8000/api/upload/pdf",{
+                        method:"POST",
+                        body:formData,
+                    });
+                    console.log(response);
+                }
+                
+               
+               console.log("file uploaded");
             }
         })
         el.click();
