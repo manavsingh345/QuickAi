@@ -11,7 +11,7 @@ export default function Sidebar(){
 
     const {allThreads,setAllThreads,currThreadId,setPrompt,setnewChat,setReply,setcurrThreadId,setprevChats} = useContext(MyContext);
     const [CardOpen,SetCardOpen]=useState(false);
-    const [sidebarOpen,setsidebarOpen]=useState(false);
+    const [sidebarOpen,setsidebarOpen]=useState(true);
 
     const getAllThreads = async () => {
         try{
