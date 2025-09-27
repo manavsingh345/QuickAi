@@ -1,15 +1,27 @@
 import express from "express";
 import thread from "../models/thread.js";
 const router = express.Router();
-import multer from 'multer';
-const upload = multer({ dest: 'uploads/' })
-
 import generateOpenAiResponse from "../utils/openai.js";
 
 import cors from 'cors'
 import { generateTitleFromMessage } from "../utils/summary.js";
 const app=express();
 app.use(cors())
+
+import multer from 'multer';
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/')
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, `${uniqueSuffix} - ${file.originalname}`)
+  }
+})
+
+const upload = multer({  storage: storage  })
 
 
 //Get all threads
