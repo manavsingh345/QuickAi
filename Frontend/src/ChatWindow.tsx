@@ -81,6 +81,7 @@ export default function ChatWindow(){
             <span className="m-4">QuickAi</span>
             
             <div className="m-4 pr-4">
+            
                <span className="h-8 w-8 rounded-full flex justify-center items-center cursor-pointer"> <ModeToggle></ModeToggle></span>
             </div>
         </div>
