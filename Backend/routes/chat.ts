@@ -8,20 +8,20 @@ import { generateTitleFromMessage } from "../utils/summary.js";
 const app=express();
 app.use(cors())
 
-import multer from 'multer';
+// import multer from 'multer';
 
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, `${uniqueSuffix} - ${file.originalname}`)
-  }
-})
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'uploads/')
+//   },
+//   filename: function (req, file, cb) {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+//     cb(null, `${uniqueSuffix} - ${file.originalname}`)
+//   }
+// })
 
-const upload = multer({  storage: storage  })
+// const upload = multer({  storage: storage  })
 
 
 //Get all threads
@@ -107,11 +107,11 @@ router.post("/chat", async (req, res) => {
 
 
 
-//pdf
-router.post("/upload/pdf",upload.single('pdf'), (req, res)=>{
-    return res.json({
-        message:"uploaded"
-    })
-})
+// //pdf
+// router.post("/upload/pdf",upload.single('pdf'), (req, res)=>{
+//     return res.json({
+//         message:"uploaded"
+//     })
+// })
 
 export default router;
