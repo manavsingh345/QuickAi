@@ -36,29 +36,29 @@ export default function ChatWindow(){
         }
         setloader(false);
     }   
-    const handleFile=  ()=>{
-        const el=document.createElement("input");
-        el.setAttribute("type","file");
-        el.setAttribute("accept","application/pdf");
-        el.addEventListener('change', async ()=>{
-            if(el.files && el.files.length>0){
-                const file=el.files.item(0);
-                if(file){
-                    const formData = new FormData();
-                    formData.append('pdf',file);
-                    const response=await fetch("http://localhost:8000/api/upload/pdf",{
-                        method:"POST",
-                        body:formData,
-                    });
-                    console.log(response);
-                }
+    // const handleFile=  ()=>{
+    //     const el=document.createElement("input");
+    //     el.setAttribute("type","file");
+    //     el.setAttribute("accept","application/pdf");
+    //     el.addEventListener('change', async ()=>{
+    //         if(el.files && el.files.length>0){
+    //             const file=el.files.item(0);
+    //             if(file){
+    //                 const formData = new FormData();
+    //                 formData.append('pdf',file);
+    //                 const response=await fetch("http://localhost:8000/api/upload/pdf",{
+    //                     method:"POST",
+    //                     body:formData,
+    //                 });
+    //                 console.log(response);
+    //             }
                 
                
-               console.log("file uploaded");
-            }
-        })
-        el.click();
-    }
+    //            console.log("file uploaded");
+    //         }
+    //     })
+    //     el.click();
+    // }
     //Append newChats to prevChats
     useEffect(()=>{
         if(prompt && reply){
@@ -91,7 +91,7 @@ export default function ChatWindow(){
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
                 {/* <div className="h-10 w-10"><input type="file" id="file" accept="application/pdf" placeholder="Choose file"/></div> */}
-               <div className="file cursor-pointer"onClick={handleFile}><i className="fa-solid fa-file-pdf"></i></div>
+               {/* <div className="file cursor-pointer"onClick={handleFile}><i className="fa-solid fa-file-pdf"></i></div> */}
                 <textarea  placeholder="Ask anything" className="w-full" 
                 value={prompt} onChange={(e)=>setPrompt(e.target.value)}
                 onKeyDown={(e)=> e.key === 'Enter'? getReply() : '' }/>
