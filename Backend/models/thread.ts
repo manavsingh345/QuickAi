@@ -15,4 +15,4 @@ const ThreadSchema=new Schema({
     
 });
 
-export default mongoose.model("Threads",ThreadSchema);
+export default mongoose.model("Thread",ThreadSchema);
