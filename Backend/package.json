@@ -4,23 +4,31 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc -b && node ./dist/src/index.js"
-  },
+  "dev": "tsc -b && node ./dist/src/index.js",
+  "dev:worker": "tsc -b && node ./dist/routes/worker.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "@google/genai": "^1.16.0",
+    "@langchain/community": "^1.0.0",
+    "@langchain/core": "^1.0.2",
+    "@langchain/google-genai": "^1.0.0",
+    "@langchain/qdrant": "^1.0.0",
+    "@langchain/textsplitters": "^1.0.0",
     "@types/express": "^5.0.3",
     "@types/mongoose": "^5.11.96",
     "@types/node-fetch": "^2.6.13",
+    "bullmq": "^5.63.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
+    "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
+    "pdf-parse": "^1.1.1",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
