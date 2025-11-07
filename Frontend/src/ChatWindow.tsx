@@ -36,6 +36,7 @@ export default function ChatWindow(){
         }
         setloader(false);
     }   
+    
     const handleFile=  ()=>{
         const el=document.createElement("input");
         el.setAttribute("type","file");
@@ -46,6 +47,7 @@ export default function ChatWindow(){
                 if(file){
                     const formData = new FormData();
                     formData.append('pdf',file);
+                    formData.append("threadId", currThreadId); //send the threadId 
                     const response=await fetch("http://localhost:8000/api/upload/pdf",{
                         method:"POST",
                         body:formData,

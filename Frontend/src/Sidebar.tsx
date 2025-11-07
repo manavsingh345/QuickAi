@@ -6,6 +6,7 @@ import {v1 as uuidv1} from "uuid";
 interface Thread {
   threadId: string;
   title: string;
+  hasPDF?: boolean;
 }
 export default function Sidebar(){
 
@@ -17,7 +18,7 @@ export default function Sidebar(){
         try{
             const response=await fetch("http://localhost:8000/api/thread");
             const res=await response.json();
-            const filterData =await res.map((thread:Thread) => ({ threadId: thread.threadId, title: thread.title}));
+            const filterData =await res.map((thread:Thread) => ({ threadId: thread.threadId, title: thread.title, hasPDF: thread.hasPDF}));
             setAllThreads(filterData);
         }catch(e){
             console.log(e);
@@ -77,7 +78,7 @@ export default function Sidebar(){
             <ul className="history">
                 {
                     allThreads?.map((thread:Thread,idx:number) =>(
-                        <li key={idx} onClick={() => changeThread(thread.threadId)}>{thread.title} <i className="fa-solid fa-trash"
+                        <li key={idx} onClick={() => changeThread(thread.threadId)}>{thread.title}  {thread.hasPDF && <i className="fa-solid fa-file-pdf text-red-500 ml-2"></i>} <i className="fa-solid fa-trash"
                         onClick={(e)=>{
                             e.stopPropagation(); //stop event bubbling
                             deleteThread(thread.threadId);
