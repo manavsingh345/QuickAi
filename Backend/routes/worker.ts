@@ -3,6 +3,14 @@ import { QdrantVectorStore } from "@langchain/qdrant";
 import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import PDFfile from "../models/PDFfile.js";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
+
+mongoose.connect(process.env.MONGO_URL! )
+  .then(() => console.log("Worker connected to DB"))
+  .catch(err => console.error("Worker DB error:", err));
 
 const worker = new Worker(
   "file-upload-queue",
@@ -21,18 +29,20 @@ const worker = new Worker(
     });
     const splitDocs = await splitter.splitDocuments(docs);
 
-    // 3️ Embeddings using Gemini
+    // 3 Embeddings using Gemini
     const embeddings = new GoogleGenerativeAIEmbeddings({
       model: "text-embedding-004",
       apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
     });
 
-    // 4️ Store chunks in Qdrant
+    // 4 Store chunks in Qdrant 
    const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
         url: "http://localhost:6333",
         collectionName: "langchainjs-testing",
     });
+
     await vectorStore.addDocuments(splitDocs);
+    await PDFfile.findOneAndUpdate({path:data.path},{embedded:true});    //store pdf path in mongodb
     console.log("PDF chunks stored in Qdrant!");
   },
   {

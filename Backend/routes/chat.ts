@@ -9,6 +9,7 @@ import { QdrantVectorStore } from "@langchain/qdrant";
 
 import cors from 'cors'
 import { generateTitleFromMessage } from "../utils/summary.js";
+import PDFfile from "../models/PDFfile.js";
 const app=express();
 app.use(cors())
 
@@ -50,7 +51,7 @@ router.get("/thread/:threadId",async (req,res)=>{
     const {threadId}=req.params;
     try{
         const th=await thread.findOne({threadId});
-        if(!thread){
+        if(!th){
             res.json({
                 message:"ThreadId not found"
             })
@@ -80,6 +81,99 @@ router.delete("/thread/:threadId",async(req,res)=>{
 });
 
 
+
+
+
+
+// //pdf
+// router.post('/upload/pdf',upload.single('pdf'),async (req,res)=>{
+//     const pdf=await PDFfile.create({
+//         originalName:req.file?.originalname,
+//         filename:req.file?.filename,
+//         path:req.file?.path, 
+//         embedded:false,
+//     })
+//      // Link PDF to thread if threadId provided in request body
+//     const { threadId } = req.body;
+//     console.log("📥 Upload request body:", req.body);
+//     console.log("📎 File uploaded:", req.file);
+
+//     if (threadId) {
+//       await thread.findOneAndUpdate(
+//         { threadId },
+//         { $push: { pdfId: pdf._id }, updatedAt: new Date() }
+//       );
+//     }
+    
+//     await queue.add('file-ready',JSON.stringify({     //file-ready is job name for bullmq
+//       filename: req.file?.originalname,
+//       source: req.file?.destination,
+//       path: req.file?.path
+//     }));
+
+  
+//     return res.json({
+//         message:"Uploaded"
+//     })
+// });
+
+router.post('/upload/pdf', upload.single('pdf'), async (req, res) => {
+  try {
+
+    const pdf = await PDFfile.create({
+      originalName: req.file?.originalname,
+      filename: req.file?.filename,
+      path: req.file?.path,
+      embedded: false,
+    });
+
+    // 1 Link PDF to thread
+    let {threadId,message}=req.body;
+    let th;
+    if (threadId) {
+    th = await thread.findOne({ threadId });
+    if (!th) {
+        console.log(`Thread ${threadId} not found → creating new thread`);
+        const shortTitle = await generateTitleFromMessage(message);
+        th = new thread({ threadId, title: shortTitle, messages: [], pdfId: [pdf._id] });
+        await th.save();
+    } else {
+        th.pdfId.push(pdf._id);
+        th.updatedAt = new Date();
+        await th.save();
+    }
+    } else {
+    console.log("No threadId provided in body → creating new thread");
+    const newThreadId = Date.now().toString(); // or use UUID
+    th = new thread({ threadId: newThreadId, title: "New Thread", messages: [], pdfId: [pdf._id] });
+    await th.save();
+    }
+
+
+    // 2 Add to queue
+    await queue.add('file-ready', JSON.stringify({
+      filename: req.file?.originalname,
+      source: req.file?.destination,
+      path: req.file?.path
+    }));
+    res.json({ message: "Uploaded successfully!" });
+  } catch (err) {
+    console.error(" Upload failed:", err);
+    res.status(500).json({ error: "Failed to upload PDF" });
+  }
+});
+
+// // Get all uploaded PDFs (for history)
+router.get("/pdf/history", async (req, res) => {
+  try {
+    const pdfs = await PDFfile.find().sort({ uploadedAt: -1 });
+    res.json(pdfs);
+  } catch (error) {
+    console.error("Error fetching PDFs:", error);
+    res.status(500).json({ message: "Error fetching uploaded PDFs" });
+  }
+});
+
 router.post("/chat", async (req, res) => {
   const { threadId, message } = req.body;
 
@@ -88,82 +182,85 @@ router.post("/chat", async (req, res) => {
   }
 
   try {
+    // --- Fetch or create thread ---
     let th = await thread.findOne({ threadId });
-
     if (!th) {
       const shortTitle = await generateTitleFromMessage(message);
-
       th = new thread({
         threadId,
-        title: shortTitle, 
+        title: shortTitle,
         messages: [{ role: "user", content: message }],
       });
     } else {
       th.messages.push({ role: "user", content: message });
     }
 
-    const assistantReply = await generateOpenAiResponse(message);
+    let assistantReply;
+
+    // --- Check if thread has PDFs ---
+    if (th.pdfId && th.pdfId.length > 0) {
+      console.log("PDFs found → using Gemini with context");
+
+      // 1️ Build embeddings retriever
+      const embeddings = new GoogleGenerativeAIEmbeddings({
+        model: "text-embedding-004",
+        apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
+      });
+
+      const vectorStore = await QdrantVectorStore.fromExistingCollection(
+        embeddings,
+        {
+          url: "http://localhost:6333",
+          collectionName: "langchainjs-testing",
+        }
+      );
+
+      const retriever = vectorStore.asRetriever({ k: 3 });
+      const results = await retriever.invoke(message);
+
+      // 2️ System prompt
+      const SYSTEM_PROMPT = `You are a helpful assistant that answers questions based on the provided PDF context.
+      Context: ${JSON.stringify(results)}`;
+
+      // 3️ Gemini chat
+      const model = new ChatGoogleGenerativeAI({
+        model: "gemini-2.5-flash",
+        apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
+      });
+
+      const response = await model.invoke([
+        ["system", SYSTEM_PROMPT],
+        ["human", message],
+      ]);
+
+       if (typeof response.content === "string") {
+        assistantReply = response.content;
+      } else if (Array.isArray(response.content)) {
+        assistantReply = response.content
+          .map((block) => ("text" in block ? block.text : ""))
+          .join("");
+      } else {
+        assistantReply = "Sorry, I couldn’t generate a proper response.";
+      }
+    } else {
+      console.log("No PDFs → using standard OpenAI reply");
+      assistantReply = await generateOpenAiResponse(message);
+    }
+
+    // --- Save and return ---
     th.messages.push({ role: "assistant", content: assistantReply });
     th.updatedAt = new Date();
     await th.save();
 
     res.json({ reply: assistantReply });
   } catch (e) {
-    console.log(e);
-    res.status(500).json({ e: "Error while sending message" });
+    console.error(e);
+    res.status(500).json({ error: "Error while sending message" });
   }
 });
 
 
 
-// //pdf
-router.post('/upload/pdf',upload.single('pdf'),async (req,res)=>{
-    await queue.add('file-ready',JSON.stringify({     //file-ready is job name for bullmq
-      filename: req.file?.originalname,
-      source: req.file?.destination,
-      path: req.file?.path
-    }));
-  
-    return res.json({
-        message:"Uploaded"
-    })
-});
-
-
-router.get('/chat/pdf',async (req,res)=>{
-  const embeddings = new GoogleGenerativeAIEmbeddings({
-      model: "text-embedding-004",
-      apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
-    });
-
-    const vectorStore = await QdrantVectorStore.fromExistingCollection(embeddings, {
-            url: "http://localhost:6333",
-            collectionName: "langchainjs-testing",
-        });
-        const ret = vectorStore.asRetriever({k:3,});
-
-        const results=await ret.invoke("What is Resource Management?");  //this query to find context k=3 okay next same for gemini okay.
-        console.log(results);
-        
-        const SYSTEM_PROMPT = `You are helpful AI Assistant who answers the user query based on the available context from pdf file.
-        Context: ${JSON.stringify(results)}`;
-
-        const model = new ChatGoogleGenerativeAI({
-            model: "gemini-2.5-flash", 
-            apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
-        });
-
-        const response = await model.invoke([
-            ["system", SYSTEM_PROMPT],
-            ["human", "What is Resource Management?"],
-        ]);
-
-        return res.json({
-            answer: response.content,
-            contextCount: results.length,
-        })
-
-    })
 
 
 
