@@ -2,10 +2,13 @@ import express from "express";
 import thread from "../models/thread.js";
 const router = express.Router();
 import generateOpenAiResponse from "../utils/openai.js";
+import 'dotenv/config';
 import multer from 'multer';
 import {Queue} from "bullmq";
 import { GoogleGenerativeAIEmbeddings,ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { QdrantVectorStore } from "@langchain/qdrant";
+import cloudinary from "../src/uploadCloudinary.js";
+import fs from "fs"
 
 import cors from 'cors'
 import { generateTitleFromMessage } from "../utils/summary.js";
@@ -20,18 +23,6 @@ const queue=new Queue("file-upload-queue",{
     }
 });
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, `${uniqueSuffix} - ${file.originalname}`)
-  }
-})
-
-const upload=multer({storage:storage});
-//above code is to how store file in uploads folder ok with uniquesuffix name. nothing else using npm multer 
 
 
 //Get all threads
@@ -86,44 +77,28 @@ router.delete("/thread/:threadId",async(req,res)=>{
 
 
 // //pdf
-// router.post('/upload/pdf',upload.single('pdf'),async (req,res)=>{
-//     const pdf=await PDFfile.create({
-//         originalName:req.file?.originalname,
-//         filename:req.file?.filename,
-//         path:req.file?.path, 
-//         embedded:false,
-//     })
-//      // Link PDF to thread if threadId provided in request body
-//     const { threadId } = req.body;
-//     console.log("📥 Upload request body:", req.body);
-//     console.log("📎 File uploaded:", req.file);
-
-//     if (threadId) {
-//       await thread.findOneAndUpdate(
-//         { threadId },
-//         { $push: { pdfId: pdf._id }, updatedAt: new Date() }
-//       );
-//     }
-    
-//     await queue.add('file-ready',JSON.stringify({     //file-ready is job name for bullmq
-//       filename: req.file?.originalname,
-//       source: req.file?.destination,
-//       path: req.file?.path
-//     }));
-
-  
-//     return res.json({
-//         message:"Uploaded"
-//     })
-// });
+const upload = multer({ dest: "uploads/" }); 
 
 router.post('/upload/pdf', upload.single('pdf'), async (req, res) => {
   try {
 
+
+    //upload to cloudinary
+    const localpath=req.file?.path;
+    const cloudUpload=await cloudinary.uploader.upload(localpath!,{
+      folder:"pdfs",
+      resource_type:"raw"
+    })
+
+    //delete tempfile
+    if(localpath) fs.unlinkSync(localpath);
+
+
+    //save cloud url to DB
     const pdf = await PDFfile.create({
       originalName: req.file?.originalname,
-      filename: req.file?.filename,
-      path: req.file?.path,
+      filename: cloudUpload.public_id,  
+      path: cloudUpload.secure_url, 
       embedded: false,
     });
 
@@ -153,9 +128,9 @@ router.post('/upload/pdf', upload.single('pdf'), async (req, res) => {
     // 2 Add to queue
     await queue.add('file-ready', JSON.stringify({
       filename: req.file?.originalname,
-      source: req.file?.destination,
-      path: req.file?.path
+      path: cloudUpload.secure_url
     }));
+
     res.json({ message: "Uploaded successfully!" });
   } catch (err) {
     console.error(" Upload failed:", err);
@@ -204,7 +179,7 @@ router.post("/chat", async (req, res) => {
       // 1️ Build embeddings retriever
       const embeddings = new GoogleGenerativeAIEmbeddings({
         model: "text-embedding-004",
-        apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
+        apiKey: process.env.GEMINI_RAG_KEY || "",
       });
 
       const vectorStore = await QdrantVectorStore.fromExistingCollection(
@@ -219,13 +194,17 @@ router.post("/chat", async (req, res) => {
       const results = await retriever.invoke(message);
 
       // 2️ System prompt
-      const SYSTEM_PROMPT = `You are a helpful assistant that answers questions based on the provided PDF context.
+      const SYSTEM_PROMPT = `You are a helpful assistant that answers questions based on the provided PDF context. 
+      If the answer exists in the context, answer from context.
+      If the context does not contain the answer, rely on your general knowledge.
+      Do not say "context not provided". 
+      Instead, answer naturally.
       Context: ${JSON.stringify(results)}`;
 
       // 3️ Gemini chat
       const model = new ChatGoogleGenerativeAI({
         model: "gemini-2.5-flash",
-        apiKey: "AIzaSyBhySTpV4nQUxCGVoJRdrlrJxUZTGzfsPk",
+        apiKey: process.env.GEMINI_RAG_KEY || "",
       });
 
       const response = await model.invoke([
@@ -258,10 +237,5 @@ router.post("/chat", async (req, res) => {
     res.status(500).json({ error: "Error while sending message" });
   }
 });
-
-
-
-
-
 
 export default router;
