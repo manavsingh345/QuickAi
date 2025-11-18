@@ -26,12 +26,10 @@ textarea:focus{
     right: 15px;
 }
 
-#submit i:hover {
-    color: #fff;
-}
 
 .info {
     font-size: 0.8rem;
     padding: 0.5rem;
     color: #b4b4b4;
 }
+

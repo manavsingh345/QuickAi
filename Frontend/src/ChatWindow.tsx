@@ -17,7 +17,6 @@ export default function ChatWindow(){
         const payload={
             message:prompt,
             threadId:currThreadId
-
         }
         const options = {
             method:"POST",
@@ -40,7 +39,7 @@ export default function ChatWindow(){
     const handleFile=  ()=>{
         const el=document.createElement("input");
         el.setAttribute("type","file");
-        el.setAttribute("accept","application/pdf");
+        el.setAttribute("accept", ".pdf, .pptx, .docx");
         el.addEventListener('change', async ()=>{
             if(el.files && el.files.length>0){
                 const file=el.files.item(0);
@@ -94,12 +93,11 @@ export default function ChatWindow(){
 
         <div className="flex flex-col justify-center items-center w-full">
             <div className="inputBox w-full flex justify-between items-center relative">
-                {/* <div className="h-10 w-10"><input type="file" id="file" accept="application/pdf" placeholder="Choose file"/></div> */}
-               { <div className="file cursor-pointer"onClick={handleFile}><i className="fa-solid fa-file-pdf"></i></div> }
+              
                 <textarea  placeholder="Ask anything" className="w-full" 
                 value={prompt} onChange={(e)=>setPrompt(e.target.value)}
                 onKeyDown={(e)=> e.key === 'Enter'? getReply() : '' }/>
-
+                <div className="file absolute left-4 top-15 -translate-y-1/2 cursor-pointer  text-lg" onClick={handleFile}><i className="fa-solid fa-file"></i></div> 
                 <div id="submit" onClick={getReply} className="cursor-pointer absolute flex justify-center items-center text-xl">
                     
                     <i className="fa-solid fa-paper-plane"></i>
